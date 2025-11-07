@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { useReactToPrint } from "react-to-print";
-import Logo from "/src/assets/logo.png";
+import Logo from "../assets/RegaliaLogo.png";
 
 const ChefPDFPreview = ({ booking, className }) => {
   const [showPreview, setShowPreview] = useState(false);
@@ -12,23 +12,59 @@ const ChefPDFPreview = ({ booking, className }) => {
   const fetchMenuData = async () => {
     setLoading(true);
     try {
+      // First try to use booking's categorizedMenu if available
+      if (booking.categorizedMenu && Object.keys(booking.categorizedMenu).length > 0) {
+        console.log('Using booking categorizedMenu:', booking.categorizedMenu);
+        setMenuData(booking.categorizedMenu);
+        setLoading(false);
+        return;
+      }
+
       const token = localStorage.getItem('token');
-      const response = await axios.get(
-        `https://regalia-backend.vercel.app/api/banquet-menus/${booking._id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-      console.log('Chef Menu API Response:', response.data);
-      console.log('Menu data structure:', response.data.data);
-      console.log('Categories:', response.data.data?.categories);
       
-      const menuData = response.data.data?.categories || response.data.data || response.data || {};
-      console.log('Final menu data:', menuData);
-      setMenuData(menuData);
+      // Try multiple API endpoints
+      const endpoints = [
+        `https://regalia-backend.vercel.app/api/banquet-menus/${booking._id}`,
+        `https://regalia-backend.vercel.app/api/menus/all/${booking.customerRef || booking._id}`,
+        `https://regalia-backend.vercel.app/api/menus/${booking._id}`
+      ];
+
+      for (const endpoint of endpoints) {
+        try {
+          console.log('Trying endpoint:', endpoint);
+          const response = await axios.get(endpoint, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          console.log('API Response:', response.data);
+          
+          let menuData = null;
+          if (response.data?.menu?.categories) {
+            menuData = response.data.menu.categories;
+          } else if (response.data?.data?.categories) {
+            menuData = response.data.data.categories;
+          } else if (response.data?.categories) {
+            menuData = response.data.categories;
+          } else if (response.data?.data) {
+            menuData = response.data.data;
+          }
+          
+          if (menuData && Object.keys(menuData).length > 0) {
+            console.log('Found menu data:', menuData);
+            setMenuData(menuData);
+            return;
+          }
+        } catch (err) {
+          console.log('Endpoint failed:', endpoint, err.message);
+          continue;
+        }
+      }
+      
+      // If no API worked, use booking data as fallback
+      setMenuData(booking.categorizedMenu || {});
     } catch (error) {
       console.error('Error fetching menu:', error);
-      setMenuData({});
+      setMenuData(booking.categorizedMenu || {});
     } finally {
       setLoading(false);
     }
@@ -59,15 +95,13 @@ const ChefPDFPreview = ({ booking, className }) => {
     <>
       <button
         onClick={handlePreview}
-        className={`w-full inline-flex items-center justify-center gap-1 rounded-lg shadow transition-colors font-semibold px-3 py-2 text-xs ${className || ''}`}
-        style={{backgroundColor: '#c3ad6b', color: 'white'}}
-        onMouseEnter={(e) => e.target.style.backgroundColor = '#b39b5a'}
-        onMouseLeave={(e) => e.target.style.backgroundColor = '#c3ad6b'}
+        className={`inline-flex items-center justify-center gap-1 bg-[#c3ad6b] hover:bg-[#b39b5a] text-white rounded transition-colors font-semibold px-2 py-1 ${className || ''}`}
+        title="Chef Instructions"
       >
         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        Chef Invoice
+        Chef
       </button>
 
       {/* Preview Modal */}
@@ -125,34 +159,41 @@ const ChefPDFPreview = ({ booking, className }) => {
                   
                   <div>
                     <h2 className="text-xl font-bold mb-6 pb-2" style={{borderBottom: '2px solid #c3ad6b', color: '#c3ad6b'}}>MENU ITEMS TO PREPARE</h2>
-                    {menuData && Object.keys(menuData).length > 0 ? (
-                      <div className="grid grid-cols-2 gap-8">
-                        {Object.entries(menuData).map(([category, items]) => {
-                          const skip = ["_id", "createdAt", "updatedAt", "__v", "bookingRef", "customerRef"];
-                          if (skip.includes(category)) return null;
-                          if (Array.isArray(items) && items.length > 0) {
-                            return (
-                              <div key={category} className="mb-6">
-                                <h3 className="text-lg font-bold mb-3 uppercase" style={{color: '#c3ad6b'}}>
-                                  {category.replaceAll("_", " ")}
-                                </h3>
-                                <ul className="space-y-2">
-                                  {items.map((item, i) => (
-                                    <li key={i} className="flex items-start">
-                                      <span className="mr-3 mt-1">•</span>
-                                      <span className="text-sm">{item}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            );
-                          }
-                          return null;
-                        })}
-                      </div>
-                    ) : (
-                      <p className="text-center py-8 text-gray-500">No menu items available</p>
-                    )}
+                    {(() => {
+                      const displayMenuData = menuData || booking.categorizedMenu;
+                      return (displayMenuData && typeof displayMenuData === 'object' && Object.keys(displayMenuData).length > 0) ? (
+                        <div className="grid grid-cols-2 gap-8">
+                          {Object.entries(displayMenuData).map(([category, items]) => {
+                            const skip = ["_id", "createdAt", "updatedAt", "__v", "bookingRef", "customerRef"];
+                            if (skip.includes(category)) return null;
+                            if (Array.isArray(items) && items.length > 0) {
+                              return (
+                                <div key={category} className="mb-6">
+                                  <h3 className="text-lg font-bold mb-3 uppercase" style={{color: '#c3ad6b'}}>
+                                    {category.replaceAll("_", " ")}
+                                  </h3>
+                                  <ul className="space-y-2">
+                                    {items.map((item, i) => (
+                                      <li key={i} className="flex items-start">
+                                        <span className="mr-3 mt-1">•</span>
+                                        <span className="text-sm">{item}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              );
+                            }
+                            return null;
+                          })}
+                        </div>
+                      ) : booking.menuItems ? (
+                        <div className="text-sm">
+                          <p>{booking.menuItems}</p>
+                        </div>
+                      ) : (
+                        <p className="text-center py-8 text-gray-500">No menu items available</p>
+                      );
+                    })()}
                   </div>
                 </div>
               )}

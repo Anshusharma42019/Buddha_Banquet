@@ -1792,16 +1792,16 @@ const AddBooking = () => {
       <Toaster position="top-center" />
 
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <Link
               to="/banquet/list-booking"
               className="flex items-center text-yellow-600 hover:text-yellow-700"
             >
-              <FaArrowLeft className="mr-2" /> Back
+              <FaArrowLeft className="mr-1 sm:mr-2" /> Back
             </Link>
-            <h1 className="text-2xl font-bold text-yellow-600">New Booking</h1>
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-yellow-600">New Booking</h1>
           </div>
         </div>
       </div>
@@ -1825,10 +1825,10 @@ const AddBooking = () => {
       </div>
 
       {/* Main Form */}
-      <main className="px-6 py-6">
-        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <main className="px-4 sm:px-6 py-4 sm:py-6">
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-md overflow-hidden">
           {/* Form Sections */}
-          <div className="p-6 space-y-8">
+          <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
             {/* Guest Information Section */}
             <section className="space-y-4">
               <div className="flex items-center space-x-3">

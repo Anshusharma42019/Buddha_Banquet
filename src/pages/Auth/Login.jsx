@@ -87,17 +87,17 @@ const Login = () => {
   return (
     <>
       <Toaster />
-      <div className="min-h-screen flex items-center justify-center" style={{backgroundColor: 'hsl(45, 100%, 95%)'}}>
-        <div className="max-w-md w-full mx-4">
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold mb-2" style={{color: 'hsl(45, 100%, 20%)'}}>
+      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8" style={{backgroundColor: 'hsl(45, 100%, 95%)'}}>
+        <div className="max-w-md w-full">
+          <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+            <div className="text-center mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2" style={{color: 'hsl(45, 100%, 20%)'}}>
                 Regalia Hotel
               </h1>
-              <p className="text-gray-600">Sign in to your account</p>
+              <p className="text-sm sm:text-base text-gray-600">Sign in to your account</p>
             </div>
             
-            <form onSubmit={login} className="space-y-6">
+            <form onSubmit={login} className="space-y-4 sm:space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email
@@ -105,7 +105,7 @@ const Login = () => {
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c3ad6b] focus:border-[#c3ad6b] outline-none transition-colors"
+                  className="w-full px-4 py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c3ad6b] focus:border-[#c3ad6b] outline-none transition-colors"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -119,14 +119,14 @@ const Login = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c3ad6b] focus:border-[#c3ad6b] outline-none transition-colors"
+                  className="w-full px-4 py-3 pr-12 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c3ad6b] focus:border-[#c3ad6b] outline-none transition-colors"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-11 text-gray-500 hover:text-gray-700"
+                  className="absolute right-3 top-11 text-gray-500 hover:text-gray-700 p-1"
                   onClick={handleTogglePassword}
                 >
                   {showPassword ? <IoIosEyeOff size={20} /> : <IoIosEye size={20} />}
@@ -135,17 +135,17 @@ const Login = () => {
 
               <button
                 type="submit"
-                className="w-full bg-[#c3ad6b] hover:bg-[#b39b5a] text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
+                className="w-full px-6 py-3 bg-[#c3ad6b] hover:bg-[#b39b5a] text-white font-medium rounded-lg transition-colors duration-200"
               >
                 Sign In
               </button>
             </form>
             
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-2">Demo Credentials:</p>
-              <div className="text-xs text-gray-500 space-y-1">
-                <div>Admin: admin@regalia.com / admin@123</div>
-                <div>Staff: staff@regalia.com / staff@123</div>
+              <div className="text-xs sm:text-sm text-gray-500 space-y-1">
+                <div className="break-all">Admin: admin@regalia.com / admin@123</div>
+                <div className="break-all">Staff: staff@regalia.com / staff@123</div>
               </div>
             </div>
           </div>

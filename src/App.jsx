@@ -38,9 +38,9 @@ function App() {
   return (
     <Router>
       {isLoggedIn ? (
-        <div className="flex min-h-screen bg-gray-100">
+        <div className="flex min-h-screen bg-gray-100 w-full overflow-x-hidden">
           <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-          <div className="flex-1 lg:ml-64 transition-all duration-300">
+          <div className="flex-1 lg:ml-64 xl:ml-72 2xl:ml-80 transition-all duration-300 min-w-0 w-full overflow-x-hidden">
             <Routes>
             <Route path="/" element={<Navigate to="/banquet/list-booking" replace />} />
             <Route path="/dashboard" element={<Dashboard setSidebarOpen={setSidebarOpen} />} />
@@ -63,7 +63,7 @@ function App() {
           </div>
         </div>
       ) : (
-        <div className="min-h-screen">
+        <div className="min-h-screen w-full">
           <Routes>
             <Route path="/*" element={<Login />} />
           </Routes>

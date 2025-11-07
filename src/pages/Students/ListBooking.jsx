@@ -437,10 +437,10 @@ const ListBooking = ({ setSidebarOpen }) => {
   }
 
   return (
-    <div className="min-h-screen" style={{backgroundColor: 'hsl(45, 100%, 95%)'}}>
+    <div className="min-h-screen w-full overflow-x-hidden" style={{backgroundColor: 'hsl(45, 100%, 95%)'}}>
       {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="container mx-auto px-3 xs:px-4 py-3 xs:py-4 flex items-center justify-between">
+      <header className="bg-white shadow-sm sticky top-0 z-50 w-full">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 xs:gap-4">
             {/* Hamburger Menu for Mobile */}
             <button
@@ -460,8 +460,8 @@ const ListBooking = ({ setSidebarOpen }) => {
       </header>
       
       {/* Main Content */}
-      <main className="container mx-auto px-3 xs:px-4 py-4 xs:py-6">
-        <div className="bg-white rounded-lg xs:rounded-xl shadow-md overflow-hidden">
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden w-full">
           <div className="p-3 xs:p-4 sm:p-6 space-y-4 xs:space-y-6">
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0">

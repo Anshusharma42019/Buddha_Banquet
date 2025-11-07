@@ -48,54 +48,52 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       )}
       
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 w-64 bg-gray-800 text-white min-h-screen z-50 flex flex-col transform transition-transform duration-300 ease-in-out ${
+      <div className={`fixed left-0 top-0 w-64 lg:w-64 xl:w-72 2xl:w-80 bg-gray-800 text-white min-h-screen z-50 flex flex-col transform transition-transform duration-300 ease-in-out ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
       {/* Logo Section */}
-      <div className="p-6 border-b border-gray-600">
+      <div className="p-4 sm:p-6 border-b border-gray-600">
         <div className="flex flex-col items-center">
-          <div className="w-49 h-49 text-2xl">
+          <div className="w-32 h-32 sm:w-40 sm:h-40">
             <img src={RegaliaLogo} alt="Regalia Logo" className="w-full h-full object-contain" />
           </div>
-          {/* <h1 className="text-xl font-bold text-yellow-400">ASHOKA</h1>
-          <p className="text-xs text-gray-400 uppercase tracking-wider">HOTEL</p>
-          <p className="text-xs text-gray-500 mt-1">SAPAN SINCE COMFORT</p> */}
         </div>
       </div>
 
       {/* Admin Section */}
-      <div className="px-6 py-4 border-b border-gray-700">
-        <h2 className="text-[#c3ad6b] font-semibold text-lg">ADMIN</h2>
+      <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-700">
+        <h2 className="text-[#c3ad6b] font-semibold text-base sm:text-lg">ADMIN</h2>
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 px-4 py-4 flex flex-col">
+      <nav className="flex-1 px-3 sm:px-4 py-4 flex flex-col">
         <ul className="space-y-2 flex-1">
           {menuItems.map((item, index) => (
             <li key={index}>
               <Link
                 to={item.path}
-                className={`flex items-center px-4 py-3 rounded-lg transition-colors duration-200 ${
+                onClick={() => setSidebarOpen(false)}
+                className={`flex items-center px-3 sm:px-4 py-3 rounded-lg transition-colors duration-200 ${
                   location.pathname === item.path
                     ? 'bg-[#c3ad6b] text-white'
                     : 'text-gray-300 hover:bg-gray-700 hover:text-white'
                 }`}
               >
-                <item.icon className="w-5 h-5 mr-3 text-[#c3ad6b]" />
-                <span className="font-medium">{item.title}</span>
+                <item.icon className="w-4 h-4 sm:w-5 sm:h-5 mr-3 text-[#c3ad6b] flex-shrink-0" />
+                <span className="font-medium text-sm sm:text-base">{item.title}</span>
               </Link>
             </li>
           ))}
         </ul>
         
         {/* Logout Button */}
-        <div className="p-4">
+        <div className="p-3 sm:p-4">
           <button
             onClick={handleLogout}
-            className="flex items-center w-full px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200"
+            className="flex items-center w-full px-3 sm:px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200"
           >
-            <FaSignOutAlt className="w-5 h-5 mr-3 text-[#c3ad6b]" />
-            <span className="font-medium">Logout</span>
+            <FaSignOutAlt className="w-4 h-4 sm:w-5 sm:h-5 mr-3 text-[#c3ad6b] flex-shrink-0" />
+            <span className="font-medium text-sm sm:text-base">Logout</span>
           </button>
         </div>
       </nav>

@@ -45,7 +45,7 @@ const Sidebar = () => {
 
       {/* Admin Section */}
       <div className="px-6 py-4 border-b border-gray-700">
-        <h2 className="text-yellow-400 font-semibold text-lg">ADMIN</h2>
+        <h2 className="text-[#c3ad6b] font-semibold text-lg">ADMIN</h2>
       </div>
 
       {/* Navigation Menu */}
@@ -57,11 +57,11 @@ const Sidebar = () => {
                 to={item.path}
                 className={`flex items-center px-4 py-3 rounded-lg transition-colors duration-200 ${
                   location.pathname === item.path
-                    ? 'bg-yellow-600 text-white'
+                    ? 'bg-[#c3ad6b] text-white'
                     : 'text-gray-300 hover:bg-gray-700 hover:text-white'
                 }`}
               >
-                <item.icon className="w-5 h-5 mr-3 text-yellow-400" />
+                <item.icon className="w-5 h-5 mr-3 text-[#c3ad6b]" />
                 <span className="font-medium">{item.title}</span>
               </Link>
             </li>

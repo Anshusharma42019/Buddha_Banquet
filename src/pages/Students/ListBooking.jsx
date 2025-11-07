@@ -44,60 +44,82 @@ const ListBooking = () => {
   // Get user role from localStorage
   const userRole = localStorage.getItem("role") || "Staff";
 
-  const fetchUsers = () => {
+  const fetchUsers = async () => {
     setLoading(true);
     try {
-      axios
-        .get(
-          `http://localhost:4000/api/bookings/pg?page=${currentPage}`
-        )
-        .then((res) => {
-          if (res.data) {
-            const processedData = res.data.data.map((item) => {
-              // Calculate total advance from array
-              const totalAdvance = Array.isArray(item.advance) 
-                ? item.advance.reduce((sum, payment) => sum + (payment.amount || 0), 0)
-                : (typeof item.advance === 'number' ? item.advance : 0);
-              
-              return {
-                ...item,
-                advance: totalAdvance,
-                total: item.total ?? 0,
-                balance: item.balance ?? 0,
-              };
-            }).sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+      const response = await axios.get(
+        `https://regalia-backend.vercel.app/api/bookings/`
+      );
+      
+      console.log('API Response:', response.data);
+      
+      let dataArray = [];
+      
+      // Handle different response structures
+      if (response.data) {
+        if (Array.isArray(response.data)) {
+          dataArray = response.data;
+        } else if (response.data.success && Array.isArray(response.data.data)) {
+          dataArray = response.data.data;
+        } else if (response.data.data && Array.isArray(response.data.data)) {
+          dataArray = response.data.data;
+        }
+      }
+      
+      if (dataArray.length > 0) {
+        const processedData = dataArray.map((item) => {
+          const totalAdvance = Array.isArray(item.advance) 
+            ? item.advance.reduce((sum, payment) => sum + (payment.amount || 0), 0)
+            : (typeof item.advance === 'number' ? item.advance : 0);
+          
+          return {
+            ...item,
+            advance: totalAdvance,
+            total: item.total ?? 0,
+            balance: item.balance ?? 0,
+            startDate: item.eventDate || item.startDate,
+          };
+        }).sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
-            console.log(processedData);
-            setUserData(processedData);
-            setTotalPages(res.data.total);
-            setLoading(false);
-          }
-        })
-        .catch((err) => {
-          console.error('Fetch Users Error:', err);
-          setLoading(false);
-        });
+        console.log('Processed Data:', processedData);
+        setUserData(processedData);
+        setTotalPages(processedData.length);
+      } else {
+        console.warn('No booking data found');
+        setUserData([]);
+        setTotalPages(0);
+      }
     } catch (error) {
-      console.log(error);
+      console.error('Fetch Users Error:', error);
+      setUserData([]);
+      setTotalPages(0);
+    } finally {
       setLoading(false);
     }
   };
 
-  const fetchAllData = () => {
+  const fetchAllData = async () => {
     try {
-      axios
-        .get(`http://localhost:4000/api/bookings/`)
-        .then((res) => {
-          if (res.data) {
-            console.log("All Data:", res.data);
-            setAllData(res.data); // All record
-          }
-        })
-        .catch((err) => {
-          console.error("All Data Error:", err);
-        });
+      const response = await axios.get(`https://regalia-backend.vercel.app/api/bookings/`);
+
+      let dataArray = [];
+      
+      if (response.data) {
+        if (Array.isArray(response.data)) {
+          dataArray = response.data;
+        } else if (response.data.success && Array.isArray(response.data.data)) {
+          dataArray = response.data.data;
+        } else if (response.data.data && Array.isArray(response.data.data)) {
+          dataArray = response.data.data;
+        }
+      }
+      
+      if (dataArray.length > 0) {
+        console.log("All Data:", dataArray);
+        setAllData(dataArray);
+      }
     } catch (error) {
-      console.log("All Data Try-Catch Error:", error);
+      console.error("All Data Error:", error);
     }
   };
 
@@ -106,8 +128,14 @@ const ListBooking = () => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
-    fetchAllData();
-    fetchUsers();
+    
+    // Add delay to prevent rapid API calls
+    const timer = setTimeout(() => {
+      fetchAllData();
+      fetchUsers();
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [currentPage]);
 
 
@@ -124,7 +152,7 @@ const ListBooking = () => {
     setLoading(true);
     try {
       axios
-        .delete(`http://localhost:4000/api/bookings/delete/${id}`)
+        .delete(`https://regalia-backend.vercel.app/api/bookings/delete/${id}`)
         .then((res) => {
           console.log(res);
           if (res.data) {
@@ -170,36 +198,34 @@ const ListBooking = () => {
     setCurrentPage(page);
   };
 
-  const handleSearch = () => {
-    if (searchQuery != "") {
+  const handleSearch = async () => {
+    if (searchQuery.trim() !== "") {
       setLoading(true);
       try {
-        axios
-          .get(
-            `http://localhost:4000/api/bookings/search?q=${searchQuery}`
-          )
-          .then((res) => {
-            console.log(res);
-            if (res.data) {
-              setUserData(res.data.data || []);
-              setTotalPages(res.data.total);
-              setLoading(false);
-            }
-          })
-          .catch((error) => {
-            console.error('Search Error:', error);
-            setUserData([]);
-            setLoading(false);
-            setTotalPages(1);
-          })
-          .finally(() => {
-            setLoading(false);
-          });
+        const response = await axios.get(
+          `https://regalia-backend.vercel.app/api/bookings/search?q=${encodeURIComponent(searchQuery)}`
+        );
+        
+        let dataArray = [];
+        
+        if (response.data) {
+          if (Array.isArray(response.data)) {
+            dataArray = response.data;
+          } else if (response.data.success && Array.isArray(response.data.data)) {
+            dataArray = response.data.data;
+          } else if (response.data.data && Array.isArray(response.data.data)) {
+            dataArray = response.data.data;
+          }
+        }
+        
+        setUserData(dataArray);
+        setTotalPages(dataArray.length);
       } catch (error) {
-        console.log(error);
+        console.error('Search Error:', error);
         setUserData([]);
+        setTotalPages(0);
+      } finally {
         setLoading(false);
-        setTotalPages(1);
       }
     } else {
       fetchUsers();
@@ -211,12 +237,8 @@ const ListBooking = () => {
     const { value } = e.target;
     setSearchQuery(value);
     clearTimeout(debounceTimeoutRef.current);
-    debounceTimeoutRef.current = setTimeout(() => debouncedSearch(value), 800);
+    debounceTimeoutRef.current = setTimeout(() => debouncedSearch(), 800);
   };
-
-  useEffect(() => {
-    handleSearch(searchQuery);
-  }, [searchQuery]);
 
   // CSV export headers and data transformation
   const csvHeaders = [
@@ -273,39 +295,34 @@ const ListBooking = () => {
 
   // handle toggle
 
-  const handleToggleStatus = (id, currentStatus) => {
-    // Toggle the status from true to false or false to true
+  const handleToggleStatus = async (id, currentStatus) => {
     const updatedStatus = !currentStatus;
 
-    // Optimistic UI update - update the status immediately in the UI
+    // Optimistic UI update
     setUserData((prevData) =>
       prevData.map((user) =>
         user._id === id ? { ...user, status: updatedStatus } : user
       )
     );
 
-    // Send API request to update status in backend
-    axios
-      .put(
-        `http://localhost:4000/little/achiver/update-status/${id}`,
-        {
-          status: updatedStatus, // Boolean status value
-        }
-      )
-      .then((res) => {
-        if (res.data) {
-          console.log("Status updated successfully:", res.data);
-        }
-      })
-      .catch((error) => {
-        console.log("Error updating status:", error);
-        // Revert the status change if the update failed
-        setUserData((prevData) =>
-          prevData.map((user) =>
-            user._id === id ? { ...user, status: currentStatus } : user
-          )
-        );
-      });
+    try {
+      const response = await axios.put(
+        `https://regalia-backend.vercel.app/little/achiver/update-status/${id}`,
+        { status: updatedStatus }
+      );
+      
+      if (response.data) {
+        console.log("Status updated successfully:", response.data);
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      // Revert the status change if the update failed
+      setUserData((prevData) =>
+        prevData.map((user) =>
+          user._id === id ? { ...user, status: currentStatus } : user
+        )
+      );
+    }
   };
 
   const renderPagination = () => {
@@ -441,19 +458,7 @@ const ListBooking = () => {
                 <h2 className="text-xl font-semibold" style={{color: 'hsl(45, 100%, 20%)'}}>
                   Manage Bookings
                 </h2>
-                <div className="flex items-center gap-2">
-                  {readyState === 1 ? (
-                    <div className="flex items-center gap-1 text-green-600">
-                      <FiWifi className="text-sm" />
-                      <span className="text-xs font-medium">Live</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1 text-red-600">
-                      <FiWifiOff className="text-sm" />
-                      <span className="text-xs font-medium">Offline</span>
-                    </div>
-                  )}
-                </div>
+
               </div>
               
               <div className="flex flex-col sm:flex-row gap-2">
@@ -521,14 +526,14 @@ const ListBooking = () => {
                             <div>
                               <div className="font-bold text-lg">{item.name}</div>
                               <div className="text-gray-500 text-sm">
-                                {item.number}
+                                {item.phone || item.number}
                               </div>
                             </div>
                           </div>
                           <div className="flex flex-col gap-1 text-sm mb-2">
                             <div>
-                              <span className="font-semibold">Start Date:</span>{" "}
-                              {new Date(item.startDate).toLocaleDateString('en-GB')}
+                              <span className="font-semibold">Event Date:</span>{" "}
+                              {new Date(item.eventDate || item.startDate).toLocaleDateString('en-GB')}
                             </div>
                             <div>
                               <span className="font-semibold">Rate Plan:</span>{" "}
@@ -582,11 +587,11 @@ const ListBooking = () => {
                             >
                               <FiFileText /> Invoice
                             </Link>
-                            <button
+                            {/* <button
                               className="flex-1 inline-flex items-center justify-center gap-1 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700 transition-colors font-semibold px-3 py-2 text-xs"
                             >
                               <FiFileText /> Chef Invoice
-                            </button>
+                            </button> */}
                           </div>
                           <div className="flex gap-2 mt-2">
                             <button
@@ -659,10 +664,10 @@ const ListBooking = () => {
                               {item.name}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              {item.number}
+                              {item.phone || item.number}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              {new Date(item.startDate).toLocaleDateString('en-GB')}
+                              {new Date(item.eventDate || item.startDate).toLocaleDateString('en-GB')}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               {item.ratePlan}
@@ -713,12 +718,7 @@ const ListBooking = () => {
                                 >
                                   <FiFileText />
                                 </Link>
-                                <button
-                                  className="inline-flex items-center gap-1 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700 transition-colors font-semibold px-2 py-1 text-xs"
-                                  title="Chef Invoice"
-                                >
-                                  <FiFileText />
-                                </button>
+
                                 <button
                                   onClick={() => {
                                     let raw = String(item.whatsapp || item.number || "").replace(/[^\d]/g, "");

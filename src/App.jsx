@@ -12,6 +12,7 @@ import RoomManagement from './pages/RoomManagement'
 import AddBooking from './pages/Students/AddBooking'
 import UpdateBooking from './pages/Students/UpdateBooking'
 import MenuView from './pages/Students/MenuView'
+import Invoice from './pages/Students/Invoice'
 import LaganCalendar from './pages/Calendar/LaganCalendar'
 import Calendar from './pages/Calendar/Calendar'
 import MenuPlanManager from './components/MenuPlanManager'
@@ -39,6 +40,7 @@ function App() {
             <Route path="/add-booking" element={<AddBooking setSidebarOpen={setSidebarOpen} />} />
             <Route path="/banquet/update-booking/:id" element={<UpdateBooking setSidebarOpen={setSidebarOpen} />} />
             <Route path="/banquet/menu-view/:id" element={<MenuView setSidebarOpen={setSidebarOpen} />} />
+            <Route path="/banquet/invoice/:id" element={<Invoice setSidebarOpen={setSidebarOpen} />} />
             <Route path="/calendar" element={<Calendar setSidebarOpen={setSidebarOpen} />} />
             <Route path="/menu-plan" element={<MenuPlanManager setSidebarOpen={setSidebarOpen} />} />
             <Route path="/lagan-calendar" element={<LaganCalendar setSidebarOpen={setSidebarOpen} />} />

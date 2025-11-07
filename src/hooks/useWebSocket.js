@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 
-const useWebSocket = (url = 'ws://localhost:8080') => {
+const useWebSocket = (url = 'wss://regalia-backend.vercel.app') => {
   const [lastMessage, setLastMessage] = useState(null)
   const [readyState, setReadyState] = useState(0) // 0: CONNECTING, 1: OPEN, 2: CLOSING, 3: CLOSED
   const ws = useRef(null)

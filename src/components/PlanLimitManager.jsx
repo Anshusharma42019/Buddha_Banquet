@@ -11,8 +11,8 @@ const PlanLimitManager = () => {
     try {
       setLoading(true);
       const [limitsResponse, categoriesResponse] = await Promise.all([
-        fetch('http://localhost:4000/api/plan-limits/get'),
-        fetch('http://localhost:4000/api/categories/all')
+        fetch('https://regalia-backend.vercel.app/api/plan-limits/get'),
+        fetch('https://regalia-backend.vercel.app/api/categories/all')
       ]);
       
       if (limitsResponse.ok) {
@@ -37,7 +37,7 @@ const PlanLimitManager = () => {
 
   const handleSave = async (planData) => {
     try {
-      const response = await fetch('http://localhost:4000/api/plan-limits', {
+      const response = await fetch('https://regalia-backend.vercel.app/api/plan-limits', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(planData)
@@ -55,7 +55,7 @@ const PlanLimitManager = () => {
 
   const handleDelete = async (planToDelete) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/plan-limits/${planToDelete._id}`, {
+      const response = await fetch(`https://regalia-backend.vercel.app/api/plan-limits/${planToDelete._id}`, {
         method: 'DELETE'
       });
       
@@ -85,7 +85,7 @@ const PlanLimitManager = () => {
     useEffect(() => {
       const fetchCategories = async () => {
         try {
-          const response = await fetch('http://localhost:4000/api/categories/all');
+          const response = await fetch('https://regalia-backend.vercel.app/api/categories/all');
           if (response.ok) {
             const data = await response.json();
             setCategories(Array.isArray(data) ? data : []);
@@ -106,7 +106,7 @@ const PlanLimitManager = () => {
 
     const handleCreateCategory = async (categoryData) => {
       try {
-        const response = await fetch('http://localhost:4000/api/categories/create', {
+        const response = await fetch('https://regalia-backend.vercel.app/api/categories/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(categoryData)
@@ -129,13 +129,13 @@ const PlanLimitManager = () => {
     const handleDeleteCategory = async (categoryId) => {
       if (window.confirm('Are you sure you want to delete this category?')) {
         try {
-          const response = await fetch(`http://localhost:4000/api/categories/delete/${categoryId}`, {
+          const response = await fetch(`https://regalia-backend.vercel.app/api/categories/delete/${categoryId}`, {
             method: 'DELETE'
           });
           
           if (response.ok) {
             alert('Category deleted successfully');
-            const categoriesResponse = await fetch('http://localhost:4000/api/categories/all');
+            const categoriesResponse = await fetch('https://regalia-backend.vercel.app/api/categories/all');
             if (categoriesResponse.ok) {
               const data = await categoriesResponse.json();
               setCategories(Array.isArray(data) ? data : []);

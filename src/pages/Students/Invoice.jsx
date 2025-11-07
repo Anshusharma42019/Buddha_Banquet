@@ -2,8 +2,8 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useReactToPrint } from "react-to-print";
-import Logo from "../../../../assets/logo.png";
-import WaterMark from "../../../../assets/WaterMark.png";
+import Logo from "../../assets/RegaliaLogo.png";
+import WaterMark from "../../assets/Regalia.png";
 import { useNavigate } from "react-router-dom";
 
 const Invoice = () => {
@@ -72,31 +72,32 @@ const Invoice = () => {
   useEffect(() => {
     const fetchBooking = async () => {
       try {
-        // Fetch booking data
-        const bookingRes = await axios.get(`http://localhost:4000/api/banquet-bookings/get/${id}`);
-        console.log('Booking API Response:', bookingRes.data);
-        if (bookingRes.data.error) {
-          throw new Error(bookingRes.data.error);
+        // First try to get all bookings and find the specific one
+        const response = await axios.get(`https://regalia-backend.vercel.app/api/bookings/`);
+        console.log('All Bookings API Response:', response.data);
+        
+        let allBookings = [];
+        
+        // Handle different response structures
+        if (response.data) {
+          if (Array.isArray(response.data)) {
+            allBookings = response.data;
+          } else if (response.data.success && Array.isArray(response.data.data)) {
+            allBookings = response.data.data;
+          } else if (response.data.data && Array.isArray(response.data.data)) {
+            allBookings = response.data.data;
+          }
         }
         
-        const bookingData = bookingRes.data.data || bookingRes.data;
+        // Find the specific booking by ID
+        const bookingData = allBookings.find(booking => booking._id === id);
         
-        // Fetch menu data
-        let categorizedMenu = null;
-        try {
-          const menuRes = await axios.get(`http://localhost:4000/api/banquet-menus/${id}`);
-          console.log('Menu API Response:', menuRes.data);
-          const rawMenuData = menuRes.data?.data || menuRes.data || null;
-          categorizedMenu = rawMenuData?.categories || rawMenuData || null;
-        } catch (menuErr) {
-          console.log('No menu found for this booking:', menuErr);
+        if (!bookingData) {
+          throw new Error('Booking not found');
         }
         
-        // Combine booking and menu data
-        setBooking({
-          ...bookingData,
-          categorizedMenu: categorizedMenu || bookingData.categorizedMenu
-        });
+        // Set the booking data
+        setBooking(bookingData);
       } catch (error) {
         console.error('Fetch error:', error);
         setError("Failed to load booking details. Please try again later.");
@@ -211,7 +212,7 @@ const Invoice = () => {
                 </h3>
                 <div className="space-y-2 print:space-y-0 print:text-xs print:text-black">
                   <p><span className="font-medium">Name:</span> {booking.name}</p>
-                  <p><span className="font-medium">Mobile:</span> {booking.number}</p>
+                  <p><span className="font-medium">Mobile:</span> {booking.phone || booking.number}</p>
                   {booking.email && <p><span className="font-medium">Email:</span> {booking.email}</p>}
                   {booking.whatsapp && <p><span className="font-medium">WhatsApp:</span> {booking.whatsapp}</p>}
                   {(booking.gst && booking.gst !== '' && booking.gst !== 0 && Number(booking.gst) > 0) ? <p><span className="font-medium">GST:</span> {booking.gst}%</p> : null}

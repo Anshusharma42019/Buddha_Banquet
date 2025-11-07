@@ -27,39 +27,15 @@ const MenuItemManager = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/categories/all')
+      const response = await fetch('https://regalia-backend.vercel.app/api/categories/all')
       if (response.ok) {
         const data = await response.json()
         setCategories(Array.isArray(data) ? data : [])
       } else {
-        // Fallback categories with mock ObjectIds
-        setCategories([
-          { _id: '674a1b2c3d4e5f6789012345', name: 'WELCOME DRINK' },
-          { _id: '674a1b2c3d4e5f6789012346', name: 'MAIN COURSE' },
-          { _id: '674a1b2c3d4e5f6789012347', name: 'DESSERTS' },
-          { _id: '674a1b2c3d4e5f6789012348', name: 'BREADS' },
-          { _id: '674a1b2c3d4e5f6789012349', name: 'RICE' },
-          { _id: '674a1b2c3d4e5f678901234a', name: 'DAL' },
-          { _id: '674a1b2c3d4e5f678901234b', name: 'VEGETABLE' },
-          { _id: '674a1b2c3d4e5f678901234c', name: 'RAITA' },
-          { _id: '674a1b2c3d4e5f678901234d', name: 'SALAD' },
-          { _id: '674a1b2c3d4e5f678901234e', name: 'STARTER VEG' }
-        ])
+        setCategories([])
       }
     } catch (error) {
-      // Fallback categories with mock ObjectIds
-      setCategories([
-        { _id: '674a1b2c3d4e5f6789012345', cateName: 'WELCOME DRINK' },
-        { _id: '674a1b2c3d4e5f6789012346', cateName: 'MAIN COURSE' },
-        { _id: '674a1b2c3d4e5f6789012347', cateName: 'DESSERTS' },
-        { _id: '674a1b2c3d4e5f6789012348', cateName: 'BREADS' },
-        { _id: '674a1b2c3d4e5f6789012349', cateName: 'RICE' },
-        { _id: '674a1b2c3d4e5f678901234a', cateName: 'DAL' },
-        { _id: '674a1b2c3d4e5f678901234b', cateName: 'VEGETABLE' },
-        { _id: '674a1b2c3d4e5f678901234c', cateName: 'RAITA' },
-        { _id: '674a1b2c3d4e5f678901234d', cateName: 'SALAD' },
-        { _id: '674a1b2c3d4e5f678901234e', cateName: 'STARTER VEG' }
-      ])
+      setCategories([])
     }
   }
 
@@ -67,8 +43,8 @@ const MenuItemManager = () => {
     setLoading(true)
     try {
       const url = foodType === 'All' 
-        ? 'http://localhost:4000/api/menu-items/'
-        : `http://localhost:4000/api/menu-items/foodtype/${foodType}`
+        ? 'https://regalia-backend.vercel.app/api/menu-items/'
+        : `https://regalia-backend.vercel.app/api/menu-items/foodtype/${foodType}`
       
       const response = await fetch(url)
       if (response.ok) {
@@ -87,7 +63,7 @@ const MenuItemManager = () => {
   const fetchMenuItems = async () => {
     setLoading(true)
     try {
-      const response = await fetch('http://localhost:4000/api/menu-items/')
+      const response = await fetch('https://regalia-backend.vercel.app/api/menu-items/')
       if (response.ok) {
         const data = await response.json()
         console.log('API Response:', data) // Debug log
@@ -105,20 +81,12 @@ const MenuItemManager = () => {
         setMenuItems(items)
         setMessage(`Loaded ${items.length} menu items from server`)
       } else {
-        setMessage(`Server error: ${response.status}. Using fallback data.`)
-        setMenuItems([
-          { _id: '1', name: 'Coffee', category: '674a1b2c3d4e5f6789012345', foodType: 'Both' },
-          { _id: '2', name: 'Cold Coffee', category: '674a1b2c3d4e5f6789012345', foodType: 'Both' },
-          { _id: '3', name: 'Fruit Punch', category: '674a1b2c3d4e5f6789012345', foodType: 'Both' }
-        ])
+        setMessage(`Server error: ${response.status}`)
+        setMenuItems([])
       }
     } catch (error) {
-      setMessage(`API unavailable: ${error.message}. Using fallback data.`)
-      setMenuItems([
-        { _id: '1', name: 'Coffee', category: '674a1b2c3d4e5f6789012345', foodType: 'Both' },
-        { _id: '2', name: 'Cold Coffee', category: '674a1b2c3d4e5f6789012345', foodType: 'Both' },
-        { _id: '3', name: 'Fruit Punch', category: '674a1b2c3d4e5f6789012345', foodType: 'Both' }
-      ])
+      setMessage(`API unavailable: ${error.message}`)
+      setMenuItems([])
     }
     setLoading(false)
   }
@@ -128,24 +96,18 @@ const MenuItemManager = () => {
     setLoading(true)
     setMessage('')
     try {
-      const response = await fetch(`http://localhost:4000/api/menus/${id}`)
+      const response = await fetch(`https://regalia-backend.vercel.app/api/menus/${id}`)
       if (response.ok) {
         const data = await response.json()
         setMenuItems(Array.isArray(data) ? data : [])
         setMessage(`Found ${data.length || 0} menu items for booking ${id}`)
       } else {
-        setMessage(`Server returned ${response.status}. Using mock data.`)
-        setMenuItems([
-          { id: 1, name: 'Paneer Tikka', category: 'STARTERS_GROUP', price: 250 },
-          { id: 2, name: 'Tea', category: 'BEVERAGES', price: 50 }
-        ])
+        setMessage(`Server returned ${response.status}`)
+        setMenuItems([])
       }
     } catch (error) {
-      setMessage(`Connection failed. Using mock data.`)
-      setMenuItems([
-        { id: 1, name: 'Paneer Tikka', category: 'STARTERS_GROUP', price: 250 },
-        { id: 2, name: 'Tea', category: 'BEVERAGES', price: 50 }
-      ])
+      setMessage(`Connection failed: ${error.message}`)
+      setMenuItems([])
     }
     setLoading(false)
   }
@@ -154,24 +116,18 @@ const MenuItemManager = () => {
     setLoading(true)
     setMessage('')
     try {
-      const response = await fetch(`http://localhost:4000/api/menus/all/${ref}`)
+      const response = await fetch(`https://regalia-backend.vercel.app/api/menus/all/${ref}`)
       if (response.ok) {
         const data = await response.json()
         setMenuItems(Array.isArray(data) ? data : [])
         setMessage(`Found menu for customer ${ref}`)
       } else {
-        setMessage(`Server returned ${response.status}. Using mock data.`)
-        setMenuItems([
-          { id: 3, name: 'Tomato Soup', category: 'SOUP_VEG', price: 120 },
-          { id: 4, name: 'Paneer Butter Masala', category: 'MAIN_COURSE_PANEER', price: 280 }
-        ])
+        setMessage(`Server returned ${response.status}`)
+        setMenuItems([])
       }
     } catch (error) {
-      setMessage(`Connection failed. Using mock data.`)
-      setMenuItems([
-        { id: 3, name: 'Tomato Soup', category: 'SOUP_VEG', price: 120 },
-        { id: 4, name: 'Paneer Butter Masala', category: 'MAIN_COURSE_PANEER', price: 280 }
-      ])
+      setMessage(`Connection failed: ${error.message}`)
+      setMenuItems([])
     }
     setLoading(false)
   }
@@ -180,7 +136,7 @@ const MenuItemManager = () => {
     setLoading(true)
     setMessage('')
     try {
-      const response = await fetch(`http://localhost:4000/api/menus/update/${ref}`, {
+      const response = await fetch(`https://regalia-backend.vercel.app/api/menus/update/${ref}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ categorizedMenu })
@@ -204,7 +160,7 @@ const MenuItemManager = () => {
 
   const saveEdit = async () => {
     try {
-      const response = await fetch(`http://localhost:4000/api/menu-items/${editingItem}`, {
+      const response = await fetch(`https://regalia-backend.vercel.app/api/menu-items/${editingItem}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editForm)
@@ -247,7 +203,7 @@ const MenuItemManager = () => {
     }
     
     try {
-      const response = await fetch('http://localhost:4000/api/menu-items/', {
+      const response = await fetch('https://regalia-backend.vercel.app/api/menu-items/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(menuItemData)
@@ -278,7 +234,7 @@ const MenuItemManager = () => {
   const handleDelete = async (id) => {
     if (confirm('Are you sure you want to delete this item?')) {
       try {
-        const response = await fetch(`http://localhost:4000/api/menu-items/${id}`, {
+        const response = await fetch(`https://regalia-backend.vercel.app/api/menu-items/${id}`, {
           method: 'DELETE'
         })
         if (response.ok) {

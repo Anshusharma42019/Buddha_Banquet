@@ -820,10 +820,9 @@ const UpdateBooking = () => {
                     onChange={handleInputChange}
                     value={booking.hall}
                   >
-                    <option value="Kitty Hall">Kitty Hall</option>
+                    <option value="Lawn">Lawn</option>
                     <option value="Banquet Hall">Banquet Hall</option>
-                    <option value="Rooftop Hall">Rooftop Hall</option>
-                    <option value="Flamingo Rooftop">Flamingo Rooftop </option>
+                    <option value="Lawn + Banquet Hall">Lawn + Banquet Hall</option>
                   </select>
                 </div>
               </div>
@@ -984,10 +983,9 @@ const UpdateBooking = () => {
                     onChange={handleInputChange}
                     value={booking.hall}
                   >
-                    <option value="Kitty Hall">Kitty Hall</option>
+                    <option value="Lawn">Lawn</option>
                     <option value="Banquet Hall">Banquet Hall</option>
-                    <option value="Rooftop Hall">Rooftop Hall</option>
-                    <option value="Flamingo Rooftop">Flamingo Rooftop </option>
+                    <option value="Lawn + Banquet Hall">Lawn + Banquet Hall</option>
                   </select>
                 </div>
               </div>

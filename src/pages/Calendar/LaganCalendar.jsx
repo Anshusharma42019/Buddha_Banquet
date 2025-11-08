@@ -5,6 +5,8 @@ import {
   FaPhone,
   FaStickyNote,
   FaRegCalendarAlt,
+  FaEdit,
+  FaFileInvoice,
 } from "react-icons/fa";
 import { useAppContext } from '../../context/AppContext';
 import DashboardLoader from '../../DashboardLoader';
@@ -547,35 +549,37 @@ function LaganCalendar({ setSidebarOpen }) {
                     </div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 xs:gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                     {displayBookings.map((b, i) => (
                       <div
                         key={i}
-                        className="bg-[#c3ad6b]/10 border border-[#c3ad6b]/20 rounded-lg p-3 xs:p-4 hover:shadow-md transition-shadow"
+                        className="bg-[#c3ad6b]/10 border border-[#c3ad6b]/20 rounded-lg p-3 hover:shadow-md transition-shadow"
                       >
-                        <div className="font-bold text-gray-800 mb-2 text-sm xs:text-base">{b.name}</div>
-                        <div className="text-xs xs:text-sm text-gray-600 space-y-1 mb-3">
-                          <div className="break-all">📞 {b.number || b.contact}</div>
+                        <div className="font-semibold text-gray-800 mb-2 text-sm truncate">{b.name}</div>
+                        <div className="text-xs text-gray-600 space-y-1 mb-3">
+                          <div className="truncate">📞 {b.number || b.contact}</div>
                           <div>📋 {b.bookingStatus}</div>
                           {b.notes && (
-                            <div className="break-words">📝 {b.notes}</div>
+                            <div className="text-xs text-gray-500 line-clamp-2">📝 {b.notes}</div>
                           )}
                         </div>
-                        <div className="flex flex-col xs:flex-row gap-2">
+                        <div className="flex gap-2">
                           <button
                             onClick={() => {
                               if (b._id) navigate(`/banquet/update-booking/${b._id}`);
                             }}
-                            className="flex-1 bg-[#c3ad6b] hover:bg-[#b39b5a] active:bg-[#a08a4f] text-white px-3 py-2 rounded-lg text-xs xs:text-sm font-medium transition-colors touch-manipulation"
+                            className="flex-1 bg-[#c3ad6b] hover:bg-[#b39b5a] text-white px-2 py-1.5 rounded text-xs font-medium transition-colors flex items-center justify-center gap-1"
                           >
+                            <FaEdit className="text-xs" />
                             Edit
                           </button>
                           <button
                             onClick={() => {
                               if (b._id) navigate(`/banquet/invoice/${b._id}`);
                             }}
-                            className="flex-1 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 text-white px-3 py-2 rounded-lg text-xs xs:text-sm font-medium transition-colors touch-manipulation"
+                            className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-2 py-1.5 rounded text-xs font-medium transition-colors flex items-center justify-center gap-1"
                           >
+                            <FaFileInvoice className="text-xs" />
                             Invoice
                           </button>
                         </div>

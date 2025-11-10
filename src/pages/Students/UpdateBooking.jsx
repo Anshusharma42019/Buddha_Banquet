@@ -158,20 +158,24 @@ const UpdateBooking = () => {
     }
   }, [booking.rooms, booking.roomPricePerUnit]);
 
-  // Auto-calculate balance and update status if advance is paid
+  // Auto-calculate balance and update status if advance is paid (only if not manually overridden)
   useEffect(() => {
     const totalAdvance = booking.advance.reduce((sum, adv) => sum + (parseFloat(adv.amount) || 0), 0);
     const total = parseFloat(booking.total) || 0;
     const balance = total - totalAdvance;
     let newStatus = booking.bookingStatus;
     let statusBool = booking.status;
-    if (totalAdvance > 0) {
+    
+    // Only auto-update if user hasn't manually set a different status
+    if (totalAdvance > 0 && booking.bookingStatus !== "Confirmed") {
       newStatus = "Confirmed";
       statusBool = true;
-    } else {
+    } else if (totalAdvance === 0 && booking.bookingStatus === "Confirmed") {
+      // Only revert if status was auto-set to Confirmed
       newStatus = "Tentative";
       statusBool = false;
     }
+    
     setBooking((prev) => ({
       ...prev,
       balance: balance.toFixed(2),

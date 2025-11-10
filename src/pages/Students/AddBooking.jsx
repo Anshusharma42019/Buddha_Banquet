@@ -171,22 +171,33 @@ const AddBooking = () => {
     setForm((prev) => ({ ...prev, balance: balance.toFixed(2) }));
   }, [form.advance, form.total]);
 
-  // Auto-update bookingStatus based on advance payment
+  // Auto-update bookingStatus based on advance payment (only if not manually overridden)
   useEffect(() => {
     const totalAdvance = form.advance.reduce((sum, adv) => sum + (parseFloat(adv.amount) || 0), 0);
     let newStatus = form.bookingStatus;
-    if (totalAdvance > 0) {
+    
+    // Only auto-update if user hasn't manually set a different status
+    if (totalAdvance > 0 && form.bookingStatus !== "Confirmed") {
       newStatus = "Confirmed";
-    } else {
+    } else if (totalAdvance === 0 && form.bookingStatus === "Confirmed") {
+      // Only revert to Enquiry if status was auto-set to Confirmed
       newStatus = "Enquiry";
     }
+    
     if (newStatus !== form.bookingStatus) {
       setForm((prev) => ({
         ...prev,
         bookingStatus: newStatus,
+        statusHistory: [
+          ...(prev.statusHistory || []),
+          {
+            status: newStatus,
+            changedAt: new Date().toISOString(),
+          },
+        ],
       }));
     }
-  }, [form.advance, form.total]);
+  }, [form.advance]);
 
   // Add advance payment
   const addAdvancePayment = () => {

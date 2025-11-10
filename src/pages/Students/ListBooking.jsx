@@ -4,6 +4,7 @@ import axios from "axios";
 import { AiFillFileExcel } from "react-icons/ai";
 import { FiSearch, FiX, FiPlus, FiEdit, FiEye, FiFileText, FiTrash2, FiWifi, FiWifiOff, FiMenu } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
+import ChefPDFPreview from "../ChefPDFPreview";
 
 const debounce = (func, delay) => {
   let timeoutId;
@@ -581,6 +582,10 @@ const ListBooking = ({ setSidebarOpen }) => {
                             >
                               <FiFileText className="text-xs" /> Invoice
                             </Link>
+                            <ChefPDFPreview 
+                              booking={item} 
+                              className="flex-1 min-w-[70px] text-xs"
+                            />
                             <button
                               onClick={() => {
                                 let raw = String(item.whatsapp || item.number || "").replace(/[^\d]/g, "");
@@ -709,6 +714,10 @@ const ListBooking = ({ setSidebarOpen }) => {
                                 >
                                   <FiFileText className="text-xs" /> Invoice
                                 </Link>
+                                <ChefPDFPreview 
+                                  booking={item} 
+                                  className="text-xs"
+                                />
                                 <button
                                   onClick={() => {
                                     let raw = String(item.whatsapp || item.number || "").replace(/[^\d]/g, "");

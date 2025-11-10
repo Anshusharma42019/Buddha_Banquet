@@ -12,6 +12,7 @@ const Invoice = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [menuData, setMenuData] = useState(null);
   const printRef = useRef();
   const navigate = useNavigate();
 
@@ -56,6 +57,20 @@ const Invoice = () => {
     `
   });
 
+  const fetchMenuData = async (customerRef) => {
+    if (!customerRef) return;
+    try {
+      console.log('Fetching menu for customerRef:', customerRef);
+      const response = await axios.get(`https://regalia-backend.vercel.app/api/menus/all/${customerRef}`);
+      console.log('Menu API Response:', response.data);
+      if (response.data && response.data.menu && response.data.menu.categories) {
+        setMenuData(response.data.menu.categories);
+      }
+    } catch (error) {
+      console.error('Error fetching menu data:', error);
+    }
+  };
+
   const handleShare = () => {
     const message = `Hi ${booking.name}, here is your booking invoice from REGALIA. Please use Ctrl+P (or Cmd+P on Mac) to print/save as PDF, then share the PDF file.`;
     const whatsappUrl = `https://wa.me/${booking.whatsapp || booking.number}?text=${encodeURIComponent(message)}`;
@@ -98,6 +113,9 @@ const Invoice = () => {
         
         // Set the booking data
         setBooking(bookingData);
+        
+        // Fetch menu data for this booking using customerRef
+        await fetchMenuData(bookingData.customerRef || bookingData._id);
       } catch (error) {
         console.error('Fetch error:', error);
         setError("Failed to load booking details. Please try again later.");
@@ -282,8 +300,10 @@ const Invoice = () => {
                 <div className="mt-4 print:mt-1">
                   <p className="font-medium text-gray-600 mb-3 print:text-xs print:text-black print:mb-1 print:font-bold">Selected Menu Items ({booking.foodType})</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 print:grid-cols-2 print:gap-2">
-                    {booking.categorizedMenu ? (
-                      Object.entries(booking.categorizedMenu)
+                    {(() => {
+                      const displayMenuData = menuData || booking.categorizedMenu;
+                      return (displayMenuData && typeof displayMenuData === 'object' && Object.keys(displayMenuData).length > 0) ? (
+                      Object.entries(displayMenuData)
                         .filter(([key, items]) => !['_id', 'bookingRef', 'customerRef', 'createdAt', 'updatedAt', '__v'].includes(key) && Array.isArray(items) && items.length > 0)
                         .map(([category, items]) => (
                           <div key={category} className="p-2 print:p-1">
@@ -295,9 +315,14 @@ const Invoice = () => {
                             </div>
                           </div>
                         ))
-                    ) : (
-                      <span className="text-gray-500 text-sm italic">No menu items selected</span>
-                    )}
+                    ) : booking.menuItems ? (
+                      <div className="text-sm text-gray-600 print:text-xs print:text-black">
+                        {booking.menuItems}
+                      </div>
+                      ) : (
+                        <span className="text-gray-500 text-sm italic">No menu items selected</span>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>

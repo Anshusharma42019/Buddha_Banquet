@@ -1,15 +1,19 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { FaUser, FaPhone, FaStickyNote, FaRegCalendarAlt, FaBars } from 'react-icons/fa'
+import { FaUser, FaPhone, FaStickyNote, FaRegCalendarAlt, FaBars, FaSearch, FaFilter } from 'react-icons/fa'
 import { bookingAPI } from '../../services/api'
 import DashboardLoader from '../../DashboardLoader'
 
 function Calendar({ setSidebarOpen }) {
   const [pageLoading, setPageLoading] = useState(true)
   const [bookings, setBookings] = useState({})
+  const [allBookings, setAllBookings] = useState([])
   const [selectedDate, setSelectedDate] = useState(null)
   const [hoveredDate, setHoveredDate] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState('All')
+  const [showFilters, setShowFilters] = useState(false)
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth <= 600 : false
   )
@@ -48,7 +52,7 @@ function Calendar({ setSidebarOpen }) {
 
   useEffect(() => {
     fetchBookings()
-  }, [month, year])
+  }, [month, year, searchTerm, statusFilter])
 
   const fetchBookings = async () => {
     setLoading(true)
@@ -67,8 +71,24 @@ function Calendar({ setSidebarOpen }) {
         bookingsArray = data.data
       }
       
+      setAllBookings(bookingsArray)
+      
+      // Apply filters
+      const filteredBookings = bookingsArray.filter(booking => {
+        const matchesSearch = !searchTerm || 
+          (booking.name && booking.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (booking.phone && booking.phone.includes(searchTerm)) ||
+          (booking.number && booking.number.includes(searchTerm)) ||
+          (booking.contact && booking.contact.includes(searchTerm))
+        
+        const matchesStatus = statusFilter === 'All' || 
+          (booking.bookingStatus && booking.bookingStatus === statusFilter)
+        
+        return matchesSearch && matchesStatus
+      })
+      
       const grouped = {}
-      bookingsArray.forEach((booking) => {
+      filteredBookings.forEach((booking) => {
         const dateKey = (booking.eventDate || booking.startDate)?.split('T')[0]
         if (dateKey) {
           if (!grouped[dateKey]) grouped[dateKey] = []
@@ -77,7 +97,7 @@ function Calendar({ setSidebarOpen }) {
       })
       
       setBookings(grouped)
-      console.log('Calendar bookings:', bookingsArray)
+      console.log('Calendar bookings:', filteredBookings)
     } catch (err) {
       console.error('Failed to fetch bookings for calendar:', err)
     } finally {
@@ -211,7 +231,7 @@ function Calendar({ setSidebarOpen }) {
         
         {/* Day number */}
         <span className={`font-bold text-xs sm:text-sm z-10 ${
-          isSelected ? 'text-white' : (fillPosition !== 'none' ? 'text-white' : 'text-gray-800')
+          isSelected ? 'text-white' : 'text-gray-800'
         }`}>
           {day}
         </span>
@@ -288,6 +308,37 @@ function Calendar({ setSidebarOpen }) {
 
   const bookingsForDate = bookings[selectedDate] || []
 
+  // Convert 24-hour time to 12-hour format
+  const convertTo12Hour = (time24) => {
+    if (!time24) return time24
+    
+    // If already in 12-hour format, return as is
+    if (time24.toLowerCase().includes('am') || time24.toLowerCase().includes('pm')) {
+      return time24
+    }
+    
+    // Handle HH:MM format
+    if (time24.includes(':')) {
+      const [hours, minutes] = time24.split(':')
+      const hour = parseInt(hours)
+      const min = minutes || '00'
+      
+      if (hour === 0) return `12:${min} AM`
+      if (hour < 12) return `${hour}:${min} AM`
+      if (hour === 12) return `12:${min} PM`
+      return `${hour - 12}:${min} PM`
+    }
+    
+    // Handle single number format
+    const hour = parseInt(time24)
+    if (isNaN(hour)) return time24
+    
+    if (hour === 0) return '12 AM'
+    if (hour < 12) return `${hour} AM`
+    if (hour === 12) return '12 PM'
+    return `${hour - 12} PM`
+  }
+
   if (pageLoading) {
     return <DashboardLoader pageName="Calendar" />
   }
@@ -321,6 +372,70 @@ function Calendar({ setSidebarOpen }) {
       <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-6">
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <div className="p-3 sm:p-6">
+            {/* Search and Filter */}
+            <div className="mb-4 sm:mb-6">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                {/* Search */}
+                <div className="flex-1 relative">
+                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by name, phone..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c3ad6b] text-sm sm:text-base"
+                  />
+                </div>
+                
+                {/* Filter Toggle */}
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`px-4 py-2 sm:py-3 rounded-lg border transition-colors text-sm sm:text-base ${
+                    showFilters 
+                      ? 'bg-[#c3ad6b] text-white border-[#c3ad6b]' 
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  <FaFilter className="inline mr-2" />
+                  Filters
+                </button>
+              </div>
+              
+              {/* Filter Options */}
+              {showFilters && (
+                <div className="mt-3 p-3 sm:p-4 bg-gray-50 rounded-lg border">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                      <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c3ad6b] text-sm"
+                      >
+                        <option value="All">All Status</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Completed">Completed</option>
+                      </select>
+                    </div>
+                    
+                    <div className="flex items-end">
+                      <button
+                        onClick={() => {
+                          setSearchTerm('')
+                          setStatusFilter('All')
+                        }}
+                        className="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
+                      >
+                        Clear Filters
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Navigation */}
             <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
               <button
@@ -403,7 +518,7 @@ function Calendar({ setSidebarOpen }) {
                           <div>📞 {b.phone || b.number || b.contact}</div>
                           <div>📋 {b.bookingStatus}</div>
                           {(b.startTime || b.time) && (
-                            <div>⏰ {b.startTime || b.time}</div>
+                            <div>⏰ {convertTo12Hour(b.startTime || b.time)}</div>
                           )}
                           {b.notes && (
                             <div>📝 {b.notes}</div>

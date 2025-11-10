@@ -15,13 +15,17 @@ const MenuItemManager = () => {
   const [foodTypeFilter, setFoodTypeFilter] = useState('All')
   const [categories, setCategories] = useState([])
 
-  // Load menu items and categories on component mount
+  // Load categories first, then menu items
   useEffect(() => {
-    fetchMenuItems()
-    fetchCategories()
+    const loadData = async () => {
+      await fetchCategories()
+      await fetchMenuItems()
+    }
+    loadData()
   }, [])
 
   const getCategoryName = (categoryId) => {
+    console.log('getCategoryName called with:', categoryId, 'categories:', categories)
     if (!categoryId) return 'Unknown'
     
     // If categoryId is already a category object, return its cateName
@@ -32,9 +36,10 @@ const MenuItemManager = () => {
     // Otherwise, find the category by ID
     const category = categories.find(cat => 
       cat._id === categoryId || 
-      cat._id.toString() === categoryId.toString()
+      cat._id?.toString() === categoryId?.toString()
     )
-    return category ? category.cateName : 'Unknown'
+    console.log('Found category:', category)
+    return category?.cateName || 'Unknown'
   }
 
   const [categoryNames, setCategoryNames] = useState({})
@@ -80,21 +85,25 @@ const MenuItemManager = () => {
         } else if (data.categories && Array.isArray(data.categories)) {
           categoriesData = data.categories
         }
+        console.log('Setting categories:', categoriesData)
         setCategories(categoriesData)
+        return categoriesData
       } else {
         console.error('Categories API error:', response.status)
         setCategories([])
+        return []
       }
     } catch (error) {
       console.error('Categories fetch error:', error)
       setCategories([])
+      return []
     }
   }
 
   const fetchMenuItemsByFoodType = async (foodType, categoryId = null) => {
     setLoading(true)
     try {
-      let url = 'https://regalia-backend.vercel.app/api/menu-items/'
+      let url = 'https://regalia-backend.vercel.app/api/menu-items'
       const params = new URLSearchParams()
       
       if (foodType !== 'All') {
@@ -111,13 +120,11 @@ const MenuItemManager = () => {
       
       console.log('Fetching menu items from URL:', url)
       const response = await fetch(url)
-      console.log('Response status:', response.status)
       
       if (response.ok) {
         const data = await response.json()
         console.log('Filter API Response:', data)
         
-        // Handle different response formats
         let items = []
         if (Array.isArray(data)) {
           items = data
@@ -127,16 +134,13 @@ const MenuItemManager = () => {
           items = data.menuItems
         }
         
-        console.log('Filtered items:', items)
         setMenuItems(items)
         setMessage(`Loaded ${items.length || 0} ${foodType === 'All' ? '' : foodType} menu items`)
       } else {
-        console.error('API Error:', response.status)
         setMessage(`Server error: ${response.status}`)
         setMenuItems([])
       }
     } catch (error) {
-      console.error('Filter Error:', error)
       setMessage(`API unavailable: ${error.message}`)
       setMenuItems([])
     }
@@ -146,12 +150,11 @@ const MenuItemManager = () => {
   const fetchMenuItems = async () => {
     setLoading(true)
     try {
-      const response = await fetch('https://regalia-backend.vercel.app/api/menu-items/')
+      const response = await fetch('https://regalia-backend.vercel.app/api/menu-items')
       if (response.ok) {
         const data = await response.json()
-        console.log('API Response:', data) // Debug log
+        console.log('API Response:', data)
         
-        // Handle different response formats
         let items = []
         if (Array.isArray(data)) {
           items = data
@@ -161,6 +164,7 @@ const MenuItemManager = () => {
           items = data.menuItems
         }
         
+        console.log('Menu items being set:', items)
         setMenuItems(items)
         setMessage(`Loaded ${items.length} menu items from server`)
       } else {
@@ -280,7 +284,6 @@ const MenuItemManager = () => {
       return
     }
     
-    // Prepare data in the format expected by backend
     const menuItemData = {
       name: newItemForm.name,
       category: newItemForm.category,
@@ -288,47 +291,52 @@ const MenuItemManager = () => {
     }
     
     try {
-      const response = await fetch('https://regalia-backend.vercel.app/api/menu-items/', {
+      const response = await fetch('https://regalia-backend.vercel.app/api/menu-items', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(menuItemData)
       })
       
       if (response.ok) {
-        const newItem = await response.json()
-        setMenuItems([...menuItems, newItem])
         setNewItemForm({ name: '', category: '', foodType: '' })
         setMessage('Menu item added successfully!')
+        // Refresh the menu items to get the latest data with proper category population
+        await fetchMenuItems()
       } else {
         const errorData = await response.text()
         setMessage(`Failed to add menu item: ${response.status} - ${errorData}`)
       }
     } catch (error) {
-      const newItem = {
-        id: Date.now(),
-        name: newItemForm.name,
-        category: newItemForm.category,
-        foodType: newItemForm.foodType
-      }
-      setMenuItems([...menuItems, newItem])
-      setNewItemForm({ name: '', category: '', foodType: '' })
-      setMessage(`API unavailable. Item added locally: ${error.message}`)
+      setMessage(`API unavailable: ${error.message}`)
     }
   }
 
   const handleDelete = async (id) => {
+    console.log('Delete clicked for ID:', id)
+    if (!id) {
+      setMessage('Error: Item ID is missing')
+      return
+    }
+    
     if (window.confirm('Are you sure you want to delete this item?')) {
       try {
+        console.log('Sending DELETE request to:', `https://regalia-backend.vercel.app/api/menu-items/${id}`)
         const response = await fetch(`https://regalia-backend.vercel.app/api/menu-items/${id}`, {
           method: 'DELETE'
         })
+        
+        console.log('Delete response status:', response.status)
+        
         if (response.ok) {
           setMenuItems(menuItems.filter(item => (item._id || item.id) !== id))
           setMessage('Item deleted successfully!')
         } else {
-          setMessage('Failed to delete item')
+          const errorText = await response.text()
+          console.log('Delete error response:', errorText)
+          setMessage(`Failed to delete item: ${response.status}`)
         }
       } catch (error) {
+        console.log('Delete error:', error)
         setMenuItems(menuItems.filter(item => (item._id || item.id) !== id))
         setMessage(`API unavailable. Item deleted locally: ${error.message}`)
       }
@@ -445,9 +453,9 @@ const MenuItemManager = () => {
                         onChange={(e) => setEditForm({...editForm, foodType: e.target.value})}
                         className="w-full px-3 py-2 border rounded-lg text-sm"
                       >
-                        <option value="Both">Both</option>
-                        <option value="Veg">Veg</option>
-                        <option value="Non-Veg">Non-Veg</option>
+                        <option key="both" value="Both">Both</option>
+                        <option key="veg" value="Veg">Veg</option>
+                        <option key="non-veg" value="Non-Veg">Non-Veg</option>
                       </select>
                       <div className="flex gap-2">
                         <button 
@@ -476,12 +484,6 @@ const MenuItemManager = () => {
                             <FaEdit size={14} />
                           </button>
                           <button 
-                            onClick={() => handleEdit(item._id || item.id)}
-                            className="text-blue-500 hover:text-blue-700 p-2 mr-2"
-                          >
-                            <FaEdit />
-                          </button>
-                          <button 
                             onClick={() => handleDelete(item._id || item.id)}
                             className="text-red-500 hover:text-red-700 p-1"
                           >
@@ -490,13 +492,7 @@ const MenuItemManager = () => {
                         </div>
                       </div>
                       <div className="space-y-1 text-xs text-gray-600">
-                        <div><span className="font-medium">Category:</span> {(() => {
-                          if (typeof item.category === 'string' && item.category.includes('cateName')) {
-                            const match = item.category.match(/cateName: '([^']+)'/);
-                            return match ? match[1] : 'Unknown';
-                          }
-                          return item.category?.cateName || 'Unknown';
-                        })()}</div>
+                        <div><span className="font-medium">Category:</span> {getCategoryName(item.category)}</div>
                         <div><span className="font-medium">Food Type:</span> {item.foodType || 'Both'}</div>
                         <div><span className="font-medium">Status:</span> <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Active</span></div>
                       </div>
@@ -549,9 +545,9 @@ const MenuItemManager = () => {
                               onChange={(e) => setEditForm({...editForm, foodType: e.target.value})}
                               className="w-full px-2 lg:px-3 py-1 lg:py-2 border rounded-lg text-xs lg:text-sm"
                             >
-                              <option value="Both">Both</option>
-                              <option value="Veg">Veg</option>
-                              <option value="Non-Veg">Non-Veg</option>
+                              <option key="both" value="Both">Both</option>
+                              <option key="veg" value="Veg">Veg</option>
+                              <option key="non-veg" value="Non-Veg">Non-Veg</option>
                             </select>
                           </td>
                           <td className="px-4 lg:px-6 py-3 lg:py-4">
@@ -576,13 +572,7 @@ const MenuItemManager = () => {
                         <>
                           <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-medium text-gray-900">{item.name}</td>
                           <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm text-blue-600 font-medium">
-                            {(() => {
-                              if (typeof item.category === 'string' && item.category.includes('cateName')) {
-                                const match = item.category.match(/cateName: '([^']+)'/);
-                                return match ? match[1] : 'Unknown';
-                              }
-                              return item.category?.cateName || 'Unknown';
-                            })()}
+                            {getCategoryName(item.category)}
                           </td>
                           <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm text-gray-900">{item.foodType || 'Both'}</td>
                           <td className="px-4 lg:px-6 py-3 lg:py-4">

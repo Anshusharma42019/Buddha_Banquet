@@ -58,7 +58,7 @@ const MenuItemManager = () => {
 
   const fetchCategoryById = async (categoryId) => {
     try {
-      const response = await fetch(`https://regalia-backend.vercel.app/api/categories/get/${categoryId}`)
+      const response = await fetch(`https://budha-backed.vercel.app/api/categories/get/${categoryId}`)
       if (response.ok) {
         const data = await response.json()
         console.log('Category by ID Response:', data)
@@ -75,7 +75,7 @@ const MenuItemManager = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('https://regalia-backend.vercel.app/api/categories/all')
+      const response = await fetch('https://budha-backed.vercel.app/api/categories/all')
       if (response.ok) {
         const data = await response.json()
         console.log('Categories API Response:', data)
@@ -106,7 +106,7 @@ const MenuItemManager = () => {
   const fetchMenuItemsByFoodType = async (foodType, categoryId = null) => {
     setLoading(true)
     try {
-      let url = 'https://regalia-backend.vercel.app/api/menu-items'
+      let url = 'https://budha-backed.vercel.app/api/menu-items'
       const params = new URLSearchParams()
       
       if (foodType !== 'All') {
@@ -153,7 +153,7 @@ const MenuItemManager = () => {
   const fetchMenuItems = async () => {
     setLoading(true)
     try {
-      const response = await fetch('https://regalia-backend.vercel.app/api/menu-items')
+      const response = await fetch('https://budha-backed.vercel.app/api/menu-items')
       if (response.ok) {
         const data = await response.json()
         console.log('API Response:', data)
@@ -186,7 +186,7 @@ const MenuItemManager = () => {
     setLoading(true)
     setMessage('')
     try {
-      const response = await fetch(`https://regalia-backend.vercel.app/api/menus/${id}`)
+      const response = await fetch(`https://budha-backed.vercel.app/api/menus/${id}`)
       if (response.ok) {
         const data = await response.json()
         setMenuItems(Array.isArray(data) ? data : [])
@@ -206,7 +206,7 @@ const MenuItemManager = () => {
     setLoading(true)
     setMessage('')
     try {
-      const response = await fetch(`https://regalia-backend.vercel.app/api/menus/all/${ref}`)
+      const response = await fetch(`https://budha-backed.vercel.app/api/menus/all/${ref}`)
       if (response.ok) {
         const data = await response.json()
         setMenuItems(Array.isArray(data) ? data : [])
@@ -226,7 +226,7 @@ const MenuItemManager = () => {
     setLoading(true)
     setMessage('')
     try {
-      const response = await fetch(`https://regalia-backend.vercel.app/api/menus/update/${ref}`, {
+      const response = await fetch(`https://budha-backed.vercel.app/api/menus/update/${ref}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ categorizedMenu })
@@ -252,7 +252,7 @@ const MenuItemManager = () => {
 
   const saveEdit = async () => {
     try {
-      const response = await fetch(`https://regalia-backend.vercel.app/api/menu-items/${editingItem}`, {
+      const response = await fetch(`https://budha-backed.vercel.app/api/menu-items/${editingItem}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editForm)
@@ -294,7 +294,7 @@ const MenuItemManager = () => {
     }
     
     try {
-      const response = await fetch('https://regalia-backend.vercel.app/api/menu-items', {
+      const response = await fetch('https://budha-backed.vercel.app/api/menu-items', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(menuItemData)
@@ -323,8 +323,8 @@ const MenuItemManager = () => {
     
     if (window.confirm('Are you sure you want to delete this item?')) {
       try {
-        console.log('Sending DELETE request to:', `https://regalia-backend.vercel.app/api/menu-items/${id}`)
-        const response = await fetch(`https://regalia-backend.vercel.app/api/menu-items/${id}`, {
+        console.log('Sending DELETE request to:', `https://budha-backed.vercel.app/api/menu-items/${id}`)
+        const response = await fetch(`https://budha-backed.vercel.app/api/menu-items/${id}`, {
           method: 'DELETE'
         })
         

@@ -3,7 +3,7 @@ import axios from 'axios'
 
 // Configure axios
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://regalia-backend.vercel.app',
+  baseURL: import.meta.env.VITE_API_URL || 'https://budha-backed.vercel.app',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json'

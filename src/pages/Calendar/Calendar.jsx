@@ -57,7 +57,7 @@ function Calendar({ setSidebarOpen }) {
   const fetchBookings = async () => {
     setLoading(true)
     try {
-      const response = await fetch('https://regalia-backend.vercel.app/api/bookings/')
+      const response = await fetch('https://budha-backed.vercel.app/api/bookings/')
       const data = await response.json()
       
       let bookingsArray = []

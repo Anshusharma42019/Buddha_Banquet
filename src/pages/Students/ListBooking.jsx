@@ -48,7 +48,7 @@ const ListBooking = ({ setSidebarOpen }) => {
     try {
       axios
         .get(
-          `https://regalia-backend.vercel.app/api/bookings/pg?page=${currentPage}`
+          `https://budha-backed.vercel.app/api/bookings/pg?page=${currentPage}`
         )
         .then((res) => {
           if (res.data) {
@@ -86,7 +86,7 @@ const ListBooking = ({ setSidebarOpen }) => {
   const fetchAllData = () => {
     try {
       axios
-        .get(`https://regalia-backend.vercel.app/api/bookings`)
+        .get(`https://budha-backed.vercel.app/api/bookings`)
         .then((res) => {
           if (res.data) {
             console.log("All Data:", res.data);
@@ -127,7 +127,7 @@ const ListBooking = ({ setSidebarOpen }) => {
     setLoading(true);
     try {
       axios
-        .delete(`https://regalia-backend.vercel.app/api/bookings/delete/${id}`)
+        .delete(`https://budha-backed.vercel.app/api/bookings/delete/${id}`)
         .then((res) => {
           console.log(res);
           if (res.data) {
@@ -178,7 +178,7 @@ const ListBooking = ({ setSidebarOpen }) => {
       setLoading(true);
       try {
         const response = await axios.get(
-          `https://regalia-backend.vercel.app/api/bookings/search?q=${encodeURIComponent(searchQuery)}`
+          `https://budha-backed.vercel.app/api/bookings/search?q=${encodeURIComponent(searchQuery)}`
         );
         
         let dataArray = [];
@@ -282,7 +282,7 @@ const ListBooking = ({ setSidebarOpen }) => {
 
     try {
       const response = await axios.put(
-        `https://regalia-backend.vercel.app/little/achiver/update-status/${id}`,
+        `https://budha-backed.vercel.app/little/achiver/update-status/${id}`,
         { status: updatedStatus }
       );
       

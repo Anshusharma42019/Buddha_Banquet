@@ -24,9 +24,9 @@ const ChefPDFPreview = ({ booking, className }) => {
       
       // Try multiple API endpoints
       const endpoints = [
-        `https://regalia-backend.vercel.app/api/banquet-menus/${booking._id}`,
-        `https://regalia-backend.vercel.app/api/menus/all/${booking.customerRef || booking._id}`,
-        `https://regalia-backend.vercel.app/api/menus/${booking._id}`
+        `https://budha-backed.vercel.app/api/banquet-menus/${booking._id}`,
+        `https://budha-backed.vercel.app/api/menus/all/${booking.customerRef || booking._id}`,
+        `https://budha-backed.vercel.app/api/menus/${booking._id}`
       ];
 
       for (const endpoint of endpoints) {

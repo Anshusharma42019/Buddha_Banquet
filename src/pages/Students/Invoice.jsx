@@ -61,7 +61,7 @@ const Invoice = () => {
     if (!customerRef) return;
     try {
       console.log('Fetching menu for customerRef:', customerRef);
-      const response = await axios.get(`https://regalia-backend.vercel.app/api/menus/all/${customerRef}`);
+      const response = await axios.get(`https://budha-backed.vercel.app/api/menus/all/${customerRef}`);
       console.log('Menu API Response:', response.data);
       if (response.data && response.data.menu && response.data.menu.categories) {
         setMenuData(response.data.menu.categories);
@@ -88,7 +88,7 @@ const Invoice = () => {
     const fetchBooking = async () => {
       try {
         // First try to get all bookings and find the specific one
-        const response = await axios.get(`https://regalia-backend.vercel.app/api/bookings/`);
+        const response = await axios.get(`https://budha-backed.vercel.app/api/bookings/`);
         console.log('All Bookings API Response:', response.data);
         
         let allBookings = [];

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { FaCalendarAlt, FaList, FaUtensils, FaCalendarCheck, FaSignOutAlt } from 'react-icons/fa'
-import RegaliaLogo from "../assets/Regalia.png"
+import PcsLogo from "../assets/pcs.png"
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const location = useLocation()
@@ -55,9 +55,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       <div className="p-4 border-b border-gray-600">
         <div className="flex flex-col items-center">
           <div className="w-40 h-40">
-            <img src={RegaliaLogo} alt="Regalia Logo" className="w-full h-full object-contain" />
+            <img src={PcsLogo} alt="PCS Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-[#c3ad6b] font-bold text-lg mt-2">REGALIA</h1>
+          <h1 className="text-[#c3ad6b] font-bold text-lg mt-2">BUDDHA</h1>
         </div>
       </div>
 
